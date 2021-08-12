@@ -1,0 +1,146 @@
+{
+    "_via_settings": {
+        "ui": {
+            "annotation_editor_height": 25,
+            "annotation_editor_fontsize": 0.8,
+            "leftsidebar_width": 18,
+            "image_grid": {
+                "img_height": 80,
+                "rshape_fill": "none",
+                "rshape_fill_opacity": 0.3,
+                "rshape_stroke": "yellow",
+                "rshape_stroke_width": 2,
+                "show_region_shape": true,
+                "show_image_policy": "all"
+            },
+            "image": {
+                "region_label": "class",
+                "region_color": "__via_default_region_color__",
+                "region_label_font": "10px Sans",
+                "on_image_annotation_editor_placement": "NEAR_REGION"
+            }
+        },
+        "core": {
+            "buffer_size": "18",
+            "filepath": {},
+            "default_filepath": "/home/lupin-ya1/notebooks/DATA_INCOME/models/yolov5/data/images/"
+        },
+        "project": {
+            "name": "fromYolaToVia"
+        }
+    },
+    "_via_img_metadata": {
+        "bus.jpg487438": {
+            "filename": "bus.jpg",
+            "size": 487438,
+            "regions": [
+                {
+                    "shape_attributes": {
+                        "name": "rect",
+                        "x": 670.78125,
+                        "y": 390.0234375,
+                        "width": 139.21875,
+                        "height": 489.1640625
+                    },
+                    "region_attributes": {
+                        "class": "person"
+                    }
+                },
+                {
+                    "shape_attributes": {
+                        "name": "rect",
+                        "x": 53.578125,
+                        "y": 401.625,
+                        "width": 189.84375,
+                        "height": 501.1875
+                    },
+                    "region_attributes": {
+                        "class": "person"
+                    }
+                },
+                {
+                    "shape_attributes": {
+                        "name": "rect",
+                        "x": 219.375,
+                        "y": 408.1640625,
+                        "width": 127.828125,
+                        "height": 456.6796875
+                    },
+                    "region_attributes": {
+                        "class": "person"
+                    }
+                },
+                {
+                    "shape_attributes": {
+                        "name": "rect",
+                        "x": 12.4453125,
+                        "y": 218.953125,
+                        "width": 789.1171875,
+                        "height": 522.28125
+                    },
+                    "region_attributes": {
+                        "class": "bus"
+                    }
+                },
+                {
+                    "shape_attributes": {
+                        "name": "rect",
+                        "x": 0.6328125,
+                        "y": 552.234375,
+                        "width": 76.1484375,
+                        "height": 325.265625
+                    },
+                    "region_attributes": {
+                        "class": "person"
+                    }
+                }
+            ],
+            "file_attributes": {}
+        },
+        "zidane.jpg168949": {
+            "filename": "zidane.jpg",
+            "size": 168949,
+            "regions": [
+                {
+                    "shape_attributes": {
+                        "name": "rect",
+                        "x": 746.0,
+                        "y": 37.0,
+                        "width": 400.0,
+                        "height": 673.0
+                    },
+                    "region_attributes": {
+                        "class": "person"
+                    }
+                },
+                {
+                    "shape_attributes": {
+                        "name": "rect",
+                        "x": 147.0,
+                        "y": 196.0,
+                        "width": 801.0,
+                        "height": 519.0
+                    },
+                    "region_attributes": {
+                        "class": "person"
+                    }
+                }
+            ],
+            "file_attributes": {}
+        }
+    },
+    "_via_attributes": {
+        "region": {
+            "class": {
+                "type": "radio",
+                "description": "",
+                "options": {
+                    "person": "",
+                    "bus": ""
+                },
+                "default_options": {}
+            }
+        },
+        "file": {}
+    }
+}

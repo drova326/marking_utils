@@ -8,11 +8,37 @@ from tqdm import tqdm
 import datetime
 import pandas as pd
 
-#marks = {}
-#path = r'D:\Kalinin_work\WORKSPACE\reps\Python\LupinYA\yolo\sets\gloves'
 width = 1280
 height = 720
 #drop_old = False
+
+def prep_dirs(source_dir, ds_name='train_data'):
+
+    #create train_data path in source directory
+
+    if os.path.exists(os.path.join(source_dir, ds_name)):
+        shutil.rmtree(os.path.join(source_dir, ds_name))
+        time.sleep(1)
+
+    #create images paths in source directory
+    os.mkdir(os.path.join(source_dir, ds_name))
+
+    img_path = os.path.join(source_dir, os.path.join(ds_name, 'images'))
+    os.makedirs(img_path, exist_ok=True)
+
+    train_img_path = os.path.join(img_path, 'train')
+    os.makedirs(train_img_path, exist_ok=True)
+    val_img_path = os.path.join(img_path, 'val')
+    os.makedirs(val_img_path, exist_ok=True)
+
+    #create labels paths 
+    lab_path = os.path.join(source_dir, os.path.join(ds_name, 'labels'))
+    os.makedirs(lab_path, exist_ok=True)
+
+    train_lab_path = os.path.join(lab_path, 'train')
+    os.makedirs(train_lab_path, exist_ok=True)
+    val_lab_path = os.path.join(lab_path, 'val')
+    os.makedirs(val_lab_path, exist_ok=True)
 
 def fromYolaToVia(path, imgs, yoloAnnotations, labels, project_name='fromYolaToVia'):
     template = json.load(open('template.json', 'r'))
@@ -63,14 +89,19 @@ def fromYolaToVia(path, imgs, yoloAnnotations, labels, project_name='fromYolaToV
 
     return template
 
-def viaGetLables(project_file):
+def viaLabels(project_file):
     if project_file.endswith('json'):
         try:
             with open(project_file, 'r') as file:
-                data = json.load(file)['_via_attributes']['region']['class']
+                info = json.load(file)
+                data = info['_via_attributes']['region']['class']
+                try:                   
+                    source_path_name = info['_via_settings']['core']['default_filepath'].split('\\')[-2]
+                except:
+                    source_path_name = os.path.basename(project_file)[:-5]
                 type = data['type']
                 classes = [x for x in data['options']]
-                return type, {classes[x]: str(x) for x in range(len(classes))}
+                return (source_path_name, {classes[x]: str(x) for x in range(len(classes))})
         except:
             print('error parsing project file', project_file)
             return None
@@ -83,12 +114,12 @@ def via2yola(annotation_file, path2files, labels):
         try:
             with open(annotation_file, 'r') as file:
                 data = json.load(file)['_via_img_metadata'].items()
-                data = {key: value for key, value in data if len(value['regions']) > 0}
+                data = {key: value for key, value in data}
         except:
             print('error parsing', annotation_file)
             return None
         out = dict()
-        for key, value in tqdm(data.items(), desc='convert via annotate for yola'):
+        for key, value in tqdm(data.items(), desc='convert via annotate for ' + os.path.basename(path2files)):
             m = set()
             if key == '_via_settings':
                 break
@@ -107,12 +138,9 @@ def via2yola(annotation_file, path2files, labels):
                         v['shape_attributes']['height'] = max(v['shape_attributes']['all_points_y'])
                         v['shape_attributes']['height'] -= v['shape_attributes']['y']
                     string = labels[v['region_attributes']['class']] + ' '
-                    string += str((v['shape_attributes']['x'] + 0.5 * v['shape_attributes']['width']) / width)
-                    string += ' '
-                    string += str((v['shape_attributes']['y'] + 0.5 * v['shape_attributes']['height']) / height)
-                    string += ' '
-                    string += str(v['shape_attributes']['width'] / width)
-                    string += ' '
+                    string += str((v['shape_attributes']['x'] + 0.5 * v['shape_attributes']['width']) / width) + ' '
+                    string += str((v['shape_attributes']['y'] + 0.5 * v['shape_attributes']['height']) / height) + ' '
+                    string += str(v['shape_attributes']['width'] / width) + ' '
                     string += str(v['shape_attributes']['height'] / height)
                     m.add(string)
                 except:
@@ -121,7 +149,7 @@ def via2yola(annotation_file, path2files, labels):
                         cl = v['region_attributes']['class']
                     # print(value['filename'], 'skip class:', cl)
             out.update({value['filename'].replace('jpg', 'txt'): m})
-        return {'path2files': path2files, 'annotate': out}
+        return out
     else:
         print('not json', annotation_file)
         return None
@@ -150,17 +178,18 @@ def get_data(path, except_dir=[]):
                         ff.add(os.path.join(root, f[:-4]))
     return ff
 
-def create_datasets(path, val_size=10):
-    if os.path.exists(os.path.join(path, 'train_val')):
-        shutil.rmtree(os.path.join(path, 'train_val'))
+def create_datasets(path, val_size_prc=10):
+    train_data = 'train_data'
+    if os.path.exists(os.path.join(path, train_data)):
+        shutil.rmtree(os.path.join(path, train_data))
         time.sleep(1)
-    os.mkdir(os.path.join(path, 'train_val'))
-    os.mkdir(os.path.join(path, os.path.join('train_val', 'images')))
-    os.mkdir(os.path.join(path, os.path.join('train_val', 'images\\train')))
-    os.mkdir(os.path.join(path, os.path.join('train_val', 'images\\val')))
-    os.mkdir(os.path.join(path, os.path.join('train_val', 'labels')))
-    os.mkdir(os.path.join(path, os.path.join('train_val', 'labels\\train')))
-    os.mkdir(os.path.join(path, os.path.join('train_val', 'labels\\val')))
+    os.mkdir(os.path.join(path, train_data))
+    os.mkdir(os.path.join(path, os.path.join(train_data, 'images')))
+    os.mkdir(os.path.join(path, os.path.join(train_data, 'images\\train')))
+    os.mkdir(os.path.join(path, os.path.join(train_data, 'images\\val')))
+    os.mkdir(os.path.join(path, os.path.join(train_data, 'labels')))
+    os.mkdir(os.path.join(path, os.path.join(train_data, 'labels\\train')))
+    os.mkdir(os.path.join(path, os.path.join(train_data, 'labels\\val')))
     data = get_data(path)
     data_by_class = dict()
     for f in data:
@@ -196,11 +225,3 @@ def create_datasets(path, val_size=10):
         shutil.copy(val[i] + '.txt', os.path.join(path, 'train_val\labels\\' + p + '\\' + bn + '.txt'))
         shutil.copy(val[i] + '.jpg', os.path.join(path, 'train_val\images\\' + p + '\\' + bn + '.jpg'))
         print(p, val[i])
-
-#path = r'D:\\Kalinin_work\\WORKSPACE\\reps\\Python\\LupinYA\\yolo\\sets\\gloves\\part7.json'
-#path2files = r'D:\\Kalinin_work\\WORKSPACE\\reps\\Python\\LupinYA\\yolo\\sets\\gloves\\part7'
-
-
-#createYolaTxt(path2files + '.json', path2files, labels, drop_old=True)
-
-#create_datasets(path=path)
